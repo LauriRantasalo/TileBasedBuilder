@@ -7,12 +7,14 @@ using UnityEngine.UI;
 public class UIHandler : MonoBehaviour
 {
     public Dropdown dropdown;
-    //WorldBuilder worldBuilder;
+    World world;
     public int selectedMaterialIndex = 0;
+    List<String> tileTypes = new List<string>() { "grass", "floor", "road" };
     void Start()
     {
-        //worldBuilder = GetComponent<WorldBuilder>();
-        //dropdown.AddOptions(worldBuilder.materialDict.Keys.ToList<string>());
+        world = GetComponent<World>();
+        //selectedTileType = Tile.grass;
+        dropdown.AddOptions(tileTypes);
     }
 
     public void Dropdown_IndexChanged(int index)

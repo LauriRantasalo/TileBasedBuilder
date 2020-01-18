@@ -9,6 +9,8 @@ public class Tile
     public static Tile floor = new Tile(World.instance.floorSprite);
     public static Tile road = new Tile(World.instance.roadSprite);
 
+    public static List<Tile> tileTypes = new List<Tile>() { grass, floor, road };
+    //public static List<string> stringTileTypes = new List<string>() { "grass", "floor", "road"};
     
     public Sprite sprite = World.instance.grassSprite;
 

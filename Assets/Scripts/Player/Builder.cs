@@ -104,6 +104,7 @@ public class Builder : MonoBehaviour
     {
         List<Chunk> chunksToUpdate = new List<Chunk>();
         Vector2 startPos = WorldToGridPos(selectionStartWorldPosition);
+        
         int directionX, directionY;
 
         if (startXSmaller)
@@ -136,18 +137,7 @@ public class Builder : MonoBehaviour
                     chunksToUpdate.Add(chunk);
                 }
 
-                chunk.tiles[(int)tileGridPos.x % World.chunkSizeX, (int)tileGridPos.y % World.chunkSizeY] = Tile.road;
-                /*
-
-                Tile tile = chunk.tiles[(int)tileGridPos.x % World.chunkSizeX, (int)tileGridPos.y % World.chunkSizeY];
-                //int tileType = uiHandler.selectedMaterialIndex;
-
-                Debug.Log((int)tileGridPos.x % World.chunkSizeX + " " + (int)tileGridPos.y % World.chunkSizeY);
-                //Sprite sprite = world.GetSprite(tileType);
-                //tile.tileMesh = meshData.UpdateTileSprite(tile.tileMesh, sprite);
-                tile.SetSprite(world.floorSprite);
-
-                */
+                chunk.tiles[(int)tileGridPos.x % World.chunkSizeX, (int)tileGridPos.y % World.chunkSizeY] = Tile.tileTypes[uiHandler.selectedMaterialIndex];//uiHandler.selectedTileType;
 
             }
 
@@ -209,8 +199,13 @@ public class Builder : MonoBehaviour
 
         return (selectionMiddlePoint, selectionLocalScale);
     }
-
+    /// <summary>
+    /// If the selections starting X position is smaller than the ending X position 
+    /// </summary>
     bool startXSmaller = false;
+    /// <summary>
+    /// If the selections starting Y position is smaller than the ending Y position
+    /// </summary>
     bool startYSmaller = false;
     (Vector2 biggerGridPositions, Vector2 smallerGridPositions) GetBiggerAndSmallerGridPositions(Vector2 selectionStartGridPosition, Vector2 selectionEndGridPosition)
     {

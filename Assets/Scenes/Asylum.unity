@@ -1308,6 +1308,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1220083762}
   - component: {fileID: 1220083761}
+  - component: {fileID: 1220083763}
+  - component: {fileID: 1220083764}
   m_Layer: 0
   m_Name: Main
   m_TagString: Untagged
@@ -1327,6 +1329,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caf653f7f6384d940885252fd580b3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  textureMaterial: {fileID: 2100000, guid: d1cf6cae7c17f1a4b8ae7559b1ae108b, type: 2}
+  grassSprite: {fileID: 8020143640844766479, guid: ce231783dc2bad141ae3016faa67eaa5,
+    type: 3}
+  floorSprite: {fileID: -6251682230944352461, guid: ce231783dc2bad141ae3016faa67eaa5,
+    type: 3}
+  roadSprite: {fileID: -1259408508766424310, guid: ce231783dc2bad141ae3016faa67eaa5,
+    type: 3}
 --- !u!4 &1220083762
 Transform:
   m_ObjectHideFlags: 0
@@ -1341,6 +1350,39 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1220083763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1220083760}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9825439cd904054f8da68c0c4419adb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridCubeGo: {fileID: 5103152442788424943, guid: 1e86397c7a631cc45b1427f607b1ae93,
+    type: 3}
+  selectionGridGo: {fileID: 1203352831090815914, guid: a56eab226133c4248a311e16314d28bd,
+    type: 3}
+  selectionStartTileGo: {fileID: 5103152442788424943, guid: 1e86397c7a631cc45b1427f607b1ae93,
+    type: 3}
+  selectionEndTileGo: {fileID: 5103152442788424943, guid: 1e86397c7a631cc45b1427f607b1ae93,
+    type: 3}
+--- !u!114 &1220083764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1220083760}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c67e5cdd54027144820c745e85aa195, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dropdown: {fileID: 0}
 --- !u!1 &1340568069
 GameObject:
   m_ObjectHideFlags: 0

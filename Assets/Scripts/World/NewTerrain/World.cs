@@ -32,6 +32,7 @@ public class World : MonoBehaviour
             chunk.CreateVisualMesh(new Mesh());
         }
         GetComponent<Builder>().enabled = true;
+        GetComponent<UIHandler>().enabled = true;
     }
 
     
