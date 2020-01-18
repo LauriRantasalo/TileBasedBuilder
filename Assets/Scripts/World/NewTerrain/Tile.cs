@@ -10,6 +10,8 @@ public class Tile
     public static Tile road = new Tile(false);
 
     public bool isTransparrent;
+    FaceCalculator fc = new FaceCalculator();
+
     public Tile()
     {
 
@@ -21,6 +23,6 @@ public class Tile
     }
     public MeshData GetMeshData(Tile[,] tiles, Vector2 position)
     {
-        throw new NotImplementedException();
+        return fc.DrawTile(tiles, this, position);
     }
 }

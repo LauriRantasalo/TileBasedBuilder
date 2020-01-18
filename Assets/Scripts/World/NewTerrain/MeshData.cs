@@ -6,11 +6,9 @@ using UnityEngine;
 
 public class MeshData
 {
-
     Vector3[] verts;
     Vector2[] uvs;
     int[] tris;
-
 
     public MeshData() { }
 
@@ -23,16 +21,17 @@ public class MeshData
 
     public void Merge(MeshData m)
     {
-        if (m.verts.Length <= 0)
+        if (m.verts == null)
         {
             return;
         }
 
-        if (verts.Length <= 0)
+        if (verts == null)
         {
             verts = m.verts;
             uvs = m.uvs;
             tris = m.tris;
+            return;
         }
 
         int count = verts.Length;
@@ -43,10 +42,7 @@ public class MeshData
         {
             ArrayUtility.Add(ref tris, m.tris[i] + count);
         }
-
-        
     }
-
 
     public void AddOffset(Vector2 location)
     {
@@ -55,6 +51,7 @@ public class MeshData
             verts[i] += new Vector3(location.x, -1, location.y);
         }
     }
+
     public Mesh CreateMesh(Mesh chunkMesh)
     {
         if (verts.Length <= 0)
