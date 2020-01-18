@@ -17,7 +17,9 @@ public class World : MonoBehaviour
 
     public Material textureMaterial;
     public Sprite grassSprite;
-    
+    public Sprite floorSprite;
+    public Sprite roadSprite;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -29,6 +31,7 @@ public class World : MonoBehaviour
             chunk.MergeChunkMesh();
             chunk.CreateVisualMesh(new Mesh());
         }
+        GetComponent<Builder>().enabled = true;
     }
 
     
@@ -45,7 +48,15 @@ public class World : MonoBehaviour
                 {
                     for (int y = 0; y < chunkSizeY; y++)
                     {
-                        chunk.tiles[x, y] = Tile.grass;
+                        if (x == 15 && y == 15)
+                        {
+                            chunk.tiles[x, y] = Tile.floor;
+
+                        }
+                        else
+                        {
+                            chunk.tiles[x, y] = Tile.grass;
+                        }
                     }
                 }
 

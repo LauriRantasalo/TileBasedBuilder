@@ -24,7 +24,13 @@ public class Chunk
         tiles = new Tile[chunkSizeX, chunkSizeY];
         
     }
-
+    public void SetTiles(Vector2[] positions, Tile tile)
+    {
+        foreach (var pos in positions)
+        {
+            tiles[(int)pos.x, (int)pos.y] = tile;
+        }
+    }
     public void MergeChunkMesh()
     {
         meshData = new MeshData();
@@ -42,7 +48,6 @@ public class Chunk
 
         if (gameObject == null)
         {
-            Debug.Log("null");
             gameObject = new GameObject("ChunkMesh", typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
         }
         gameObject.transform.position = new Vector3(position.x * chunkSizeX, 0, position.y * chunkSizeY);
@@ -50,7 +55,7 @@ public class Chunk
         gameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
         gameObject.GetComponent<MeshCollider>().sharedMesh = mesh;
 
-
+        gameObject.layer = LayerMask.NameToLayer("TileMask");
 
     }
 }
