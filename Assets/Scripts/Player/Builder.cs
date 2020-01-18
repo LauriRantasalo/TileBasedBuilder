@@ -104,11 +104,30 @@ public class Builder : MonoBehaviour
     {
         List<Chunk> chunksToUpdate = new List<Chunk>();
         Vector2 startPos = WorldToGridPos(selectionStartWorldPosition);
+        int directionX, directionY;
+
+        if (startXSmaller)
+        {
+            directionX = 1;
+        }
+        else
+        {
+            directionX = -1;
+        }
+
+        if (startYSmaller)
+        {
+            directionY = 1;
+        }
+        else
+        {
+            directionY = -1;
+        }
         for (int x = 0; x < selectedTiles.GetLength(0); x++)
         {
             for (int y = 0; y < selectedTiles.GetLength(1); y++)
             {
-                Vector2 tileGridPos = new Vector2(startPos.x + x, startPos.y + y);
+                Vector2 tileGridPos = new Vector2(startPos.x + x * directionX, startPos.y + y * directionY);
                 Vector2 chunkPos = GridToChunkPos(tileGridPos);
                 Chunk chunk = world.chunks[(int)chunkPos.x, (int)chunkPos.y];
 
@@ -191,29 +210,34 @@ public class Builder : MonoBehaviour
         return (selectionMiddlePoint, selectionLocalScale);
     }
 
-
+    bool startXSmaller = false;
+    bool startYSmaller = false;
     (Vector2 biggerGridPositions, Vector2 smallerGridPositions) GetBiggerAndSmallerGridPositions(Vector2 selectionStartGridPosition, Vector2 selectionEndGridPosition)
     {
         Vector2 biggerGridPositions;
         Vector2 smallerGridPositions;
         if (selectionStartGridPosition.x >= selectionEndGridPosition.x)
         {
+            startXSmaller = false;
             biggerGridPositions.x = selectionStartGridPosition.x;
             smallerGridPositions.x = selectionEndGridPosition.x;
         }
         else
         {
+            startXSmaller = true;
             biggerGridPositions.x = selectionEndGridPosition.x;
             smallerGridPositions.x = selectionStartGridPosition.x;
         }
 
         if (selectionStartGridPosition.y >= selectionEndGridPosition.y)
         {
+            startYSmaller = false;
             biggerGridPositions.y = selectionStartGridPosition.y;
             smallerGridPositions.y = selectionEndGridPosition.y;
         }
         else
         {
+            startYSmaller = true;
             biggerGridPositions.y = selectionEndGridPosition.y;
             smallerGridPositions.y = selectionStartGridPosition.y;
         }
