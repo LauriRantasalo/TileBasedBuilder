@@ -19,7 +19,52 @@ public class MeshData
         this.tris = tris;
     }
 
-    public void Merge(MeshData m)
+    public void MergeWalls(MeshData m, Vector2 offset)
+    {
+        if (m.verts == null)
+        {
+            return;
+        }
+
+        if (verts == null)
+        {
+            verts = m.verts;
+            uvs = m.uvs;
+            tris = m.tris;
+
+
+            return;
+        }
+
+        int count = verts.Length;
+        ArrayUtility.AddRange(ref verts, m.verts);
+        ArrayUtility.AddRange(ref uvs, m.uvs);
+
+        for (int i = 0; i < m.tris.Length; i++)
+        {
+            ArrayUtility.Add(ref tris, m.tris[i] + count);
+        }
+        //AddWallOffset(offset);
+
+    }
+
+    public void AddWallOffset(Vector2 location)
+    {
+        for (int i = 0; i < verts.Length; i++)
+        {
+            verts[i] += new Vector3(location.x, 0, location.y);
+        }
+    }
+
+    public void AddTileOffset(Vector2 location)
+    {
+        for (int i = 0; i < verts.Length; i++)
+        {
+            verts[i] += new Vector3(location.x, -1, location.y);
+        }
+    }
+
+    public void MergeTiles(MeshData m)
     {
         if (m.verts == null)
         {
@@ -44,15 +89,7 @@ public class MeshData
         }
     }
 
-    public void AddOffset(Vector2 location)
-    {
-        for (int i = 0; i < verts.Length; i++)
-        {
-            verts[i] += new Vector3(location.x, -1, location.y);
-        }
-    }
-
-    public Mesh CreateMesh(Mesh chunkMesh)
+    public Mesh CreateMesh(Mesh mesh)
     {
         if (verts.Length <= 0)
         {
@@ -60,13 +97,13 @@ public class MeshData
         }
         else
         {
-            chunkMesh.vertices = verts;
-            chunkMesh.triangles = tris;
-            chunkMesh.uv = uvs;
+            mesh.vertices = verts;
+            mesh.triangles = tris;
+            mesh.uv = uvs;
 
-            chunkMesh.RecalculateBounds();
-            chunkMesh.RecalculateNormals();
-            return chunkMesh;
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
+            return mesh;
         }
     }
 }

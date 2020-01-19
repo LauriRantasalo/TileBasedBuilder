@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class World : MonoBehaviour
@@ -10,8 +11,8 @@ public class World : MonoBehaviour
     public static int chunkSizeX = 16;
     public static int chunkSizeY = 16;
 
-    public static int chunkGridSizeX = 2;
-    public static int chunkGridSizeY = 2;
+    public static int chunkGridSizeX = 3;
+    public static int chunkGridSizeY = 3;
 
     public Chunk[,] chunks;
 
@@ -19,22 +20,27 @@ public class World : MonoBehaviour
     public Sprite grassSprite;
     public Sprite floorSprite;
     public Sprite roadSprite;
+    public Sprite wallSprite;
+
+    public GameObject wallCubeGo;
 
     // Start is called before the first frame update
     void Start()
     {
         // This seems even worse
         World.instance = this;
+
         GenerateChunks();
         foreach (Chunk chunk in chunks)
         {
             chunk.MergeChunkMesh();
-            chunk.CreateVisualMesh(new Mesh());
+            chunk.CreateVisualChunkMesh(new Mesh());
         }
         GetComponent<Builder>().enabled = true;
         GetComponent<UIHandler>().enabled = true;
     }
 
+    //this should be in chunk
     
     private void GenerateChunks()
     {

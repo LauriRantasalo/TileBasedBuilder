@@ -1,14 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 
 public class Chunk
 {
-    public GameObject gameObject;
+    public GameObject chunkGameObject;
+    public GameObject wallGameObject;
+
+
     public Vector2 position;
     public Tile[,] tiles;
-    public MeshData meshData;
+    public MeshData chunkMeshData;
+    public MeshData wallMeshData;
 
     Mesh mesh;
 
@@ -24,6 +29,38 @@ public class Chunk
         tiles = new Tile[chunkSizeX, chunkSizeY];
         
     }
+    
+
+    public void MergeWallMesh(Mesh newWallMesh)
+    {
+        wallMeshData = new MeshData();
+        for (int x = 0; x < chunkSizeX; x++)
+        {
+            for (int y = 0; y < chunkSizeY; y++)
+            {
+                if (tiles[x,y] == Tile.wall)
+                {
+                    wallMeshData.MergeWalls(new MeshData(newWallMesh.vertices, newWallMesh.uv, newWallMesh.triangles), new Vector2(x, y));
+                    //wallMeshData.AddWallOffset(new Vector2(x, y));
+                }
+            }
+        }
+    }
+
+    public void CreateVisualWallMesh(Mesh wallMesh)
+    {
+        mesh = wallMeshData.CreateMesh(wallMesh);
+
+        if (wallGameObject == null)
+        {
+            wallGameObject = new GameObject("WallMesh", typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
+            wallGameObject.transform.position = new Vector3(position.x * chunkSizeX, 0, position.y * chunkSizeY);
+        }
+        wallGameObject.GetComponent<MeshRenderer>().material = World.instance.textureMaterial;
+        wallGameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
+        wallGameObject.GetComponent<MeshCollider>().sharedMesh = mesh;
+    }
+
     public void SetTiles(Vector2[] positions, Tile tile)
     {
         foreach (var pos in positions)
@@ -33,29 +70,29 @@ public class Chunk
     }
     public void MergeChunkMesh()
     {
-        meshData = new MeshData();
+        chunkMeshData = new MeshData();
         for (int x = 0; x < chunkSizeX; x++)
         {
             for (int y = 0; y < chunkSizeY; y++)
             {
-                meshData.Merge(tiles[x, y].GetMeshData(tiles, new Vector2(x,y)));
+                chunkMeshData.MergeTiles(tiles[x, y].GetMeshData(tiles, new Vector2(x,y)));
             }
         }
     }
-    public void CreateVisualMesh(Mesh chunkMesh)
+    public void CreateVisualChunkMesh(Mesh chunkMesh)
     {
-        mesh = meshData.CreateMesh(chunkMesh);
+        mesh = chunkMeshData.CreateMesh(chunkMesh);
 
-        if (gameObject == null)
+        if (chunkGameObject == null)
         {
-            gameObject = new GameObject("ChunkMesh", typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
+            chunkGameObject = new GameObject("ChunkMesh", typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
         }
-        gameObject.transform.position = new Vector3(position.x * chunkSizeX, 0, position.y * chunkSizeY);
-        gameObject.GetComponent<MeshRenderer>().material = World.instance.textureMaterial;
-        gameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
-        gameObject.GetComponent<MeshCollider>().sharedMesh = mesh;
+        chunkGameObject.transform.position = new Vector3(position.x * chunkSizeX, 0, position.y * chunkSizeY);
+        chunkGameObject.GetComponent<MeshRenderer>().material = World.instance.textureMaterial;
+        chunkGameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
+        chunkGameObject.GetComponent<MeshCollider>().sharedMesh = mesh;
 
-        gameObject.layer = LayerMask.NameToLayer("TileMask");
+        chunkGameObject.layer = LayerMask.NameToLayer("TileMask");
 
     }
 }

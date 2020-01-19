@@ -71,7 +71,7 @@ public class Builder : MonoBehaviour
             {
                 selectedTiles = FindSelectedTiles(WorldToGridPos(selectionStartWorldPosition), WorldToGridPos(selectionEndWorldPosition));
 
-                Debug.Log(selectedTiles.Length);
+                //Debug.Log(selectedTiles.Length);
                 selectionStartTile.SetActive(false);
                 selectionEndTile.SetActive(false);
                 selectionGrid.SetActive(false);
@@ -147,8 +147,17 @@ public class Builder : MonoBehaviour
         foreach (Chunk c in chunksToUpdate)
         {
             c.MergeChunkMesh();
-            c.CreateVisualMesh(c.gameObject.GetComponent<MeshFilter>().mesh);
+            c.CreateVisualChunkMesh(c.chunkGameObject.GetComponent<MeshFilter>().mesh);
+            // this breaks selection
+            //world.CreateWalls(c);
+            if (uiHandler.selectedMaterialIndex == 3)
+            {
+                c.MergeWallMesh(world.wallCubeGo.GetComponent<MeshFilter>().sharedMesh);
+                c.CreateVisualWallMesh(new Mesh());
+            }
+            
         }
+
     }
 
 

@@ -9,7 +9,7 @@ public class UIHandler : MonoBehaviour
     public Dropdown dropdown;
     World world;
     public int selectedMaterialIndex = 0;
-    List<String> tileTypes = new List<string>() { "grass", "floor", "road" };
+    List<String> tileTypes = new List<string>() { "grass", "floor", "road", "wall" };
     void Start()
     {
         world = GetComponent<World>();

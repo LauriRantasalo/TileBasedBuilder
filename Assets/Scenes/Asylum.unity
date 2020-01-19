@@ -448,7 +448,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1220083764}
         m_MethodName: Dropdown_IndexChanged
         m_Mode: 0
         m_Arguments:
@@ -1336,6 +1336,10 @@ MonoBehaviour:
     type: 3}
   roadSprite: {fileID: -1259408508766424310, guid: ce231783dc2bad141ae3016faa67eaa5,
     type: 3}
+  wallSprite: {fileID: -5962389079421231736, guid: ce231783dc2bad141ae3016faa67eaa5,
+    type: 3}
+  wallCubeGo: {fileID: 8621717785031692165, guid: be42f4fb0829b85489e4c319504de3ec,
+    type: 3}
 --- !u!4 &1220083762
 Transform:
   m_ObjectHideFlags: 0
@@ -1377,12 +1381,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1220083760}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c67e5cdd54027144820c745e85aa195, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dropdown: {fileID: 0}
+  dropdown: {fileID: 437604455}
+  selectedMaterialIndex: 0
 --- !u!1 &1340568069
 GameObject:
   m_ObjectHideFlags: 0
