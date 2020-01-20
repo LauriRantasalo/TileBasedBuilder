@@ -14,8 +14,8 @@ public class Builder : MonoBehaviour
     public GameObject selectionEndTileGo;
 
     GameObject gridCube, selectionGrid, selectionStartTile, selectionEndTile;
-    Vector3 selectionStartWorldPosition;
-    Vector3 selectionEndWorldPosition;
+    Vector2 selectionStartWorldPosition;
+    Vector2 selectionEndWorldPosition;
 
     Tile[,] selectedTiles;
     LayerMask tileLayerMask;
@@ -49,6 +49,7 @@ public class Builder : MonoBehaviour
             gridCube.SetActive(true);
             if (Input.GetMouseButtonDown(0))
             {
+              
                 //selectedTiles = null;
 
                 selectionGrid.SetActive(false);
@@ -60,24 +61,38 @@ public class Builder : MonoBehaviour
             }
             if (Input.GetMouseButton(0) && selectionStartTile.activeSelf)
             {
-                selectionEndWorldPosition = new Vector2(Mathf.FloorToInt(hit.point.x) + 0.5f, Mathf.FloorToInt(hit.point.z) + 0.5f);
+                // If Building a wall
+                if (uiHandler.selectedMaterialIndex == 3)
+                {
+                    if (Mathf.Abs(hit.point.x - selectionStartWorldPosition.x) > Mathf.Abs(hit.point.z - selectionStartWorldPosition.y))
+                    {
+                        selectionEndWorldPosition = new Vector2(Mathf.FloorToInt(hit.point.x) + 0.5f, selectionStartWorldPosition.y);
+                    }
+                    else
+                    {
+                        selectionEndWorldPosition = new Vector2(selectionStartWorldPosition.x, Mathf.FloorToInt(hit.point.z) + 0.5f);
+                    }
+                }
+                else
+                {
+                    selectionEndWorldPosition = new Vector2(Mathf.FloorToInt(hit.point.x) + 0.5f, Mathf.FloorToInt(hit.point.z) + 0.5f);
+                }
                 selectionEndTile.transform.position = new Vector3(selectionEndWorldPosition.x, 0, selectionEndWorldPosition.y);
                 selectionEndTile.SetActive(true);
 
                 (selectionGrid.transform.position, selectionGrid.transform.localScale) = SetUpSelection();
                 selectionGrid.SetActive(true);
+
             }
             if (Input.GetMouseButtonUp(0) && selectionStartTile.activeSelf)
             {
                 selectedTiles = FindSelectedTiles(WorldToGridPos(selectionStartWorldPosition), WorldToGridPos(selectionEndWorldPosition));
 
-                //Debug.Log(selectedTiles.Length);
                 selectionStartTile.SetActive(false);
                 selectionEndTile.SetActive(false);
                 selectionGrid.SetActive(false);
 
-                UpdateSelectedTileSprites();
-                //FillSelectedNodesWith(materialDict.Values.ElementAt(uiHandler.selectedMaterialIndex));
+                UpdateSelectedTiles();
             }
         }
         else if (gridCube.transform.position != new Vector3(0, -2, 0) || gridCube.activeSelf)
@@ -100,30 +115,15 @@ public class Builder : MonoBehaviour
         }
     }
 
-    void UpdateSelectedTileSprites()
+    void UpdateSelectedTiles()
     {
         List<Chunk> chunksToUpdate = new List<Chunk>();
         Vector2 startPos = WorldToGridPos(selectionStartWorldPosition);
-        
-        int directionX, directionY;
 
-        if (startXSmaller)
-        {
-            directionX = 1;
-        }
-        else
-        {
-            directionX = -1;
-        }
-
-        if (startYSmaller)
-        {
-            directionY = 1;
-        }
-        else
-        {
-            directionY = -1;
-        }
+        Vector2 directionV = GetSelectionDirection();
+        int directionX = (int)directionV.x;
+        int directionY = (int)directionV.y;
+       
         for (int x = 0; x < selectedTiles.GetLength(0); x++)
         {
             for (int y = 0; y < selectedTiles.GetLength(1); y++)
@@ -145,16 +145,13 @@ public class Builder : MonoBehaviour
                 chunk.tiles[(int)tileGridPos.x % World.chunkSizeX, (int)tileGridPos.y % World.chunkSizeY] = Tile.tileTypes[uiHandler.selectedMaterialIndex];//uiHandler.selectedTileType;
 
             }
-
-
         }
 
         foreach (Chunk c in chunksToUpdate)
         {
             c.MergeChunkMesh();
             c.CreateVisualChunkMesh(c.chunkGameObject.GetComponent<MeshFilter>().mesh);
-            // this breaks selection
-            //world.CreateWalls(c);
+            // There has to be a better way for this
             if (uiHandler.selectedMaterialIndex == 3)
             {
                 c.MergeWallMesh(world.wallCubeGo.GetComponent<MeshFilter>().sharedMesh);
@@ -166,39 +163,12 @@ public class Builder : MonoBehaviour
                 {
                     c.MergeWallMesh(world.wallCubeGo.GetComponent<MeshFilter>().sharedMesh);
                     c.CreateVisualWallMesh(new Mesh());
-
-                    
                     c.wallsToRemoveAt.Clear();
                 }
             }
             
         }
 
-    }
-
-
-
-    private Tile[,] FindSelectedTiles(Vector2 startGridPos, Vector2 endGridPos)
-    {
-
-        Vector2 selectionStartPosChunk = GridToChunkPos(startGridPos);
-        Vector2 selectionEndPosChunk = GridToChunkPos(endGridPos);
-
-        Vector2 biggerGridPositions;
-        Vector2 smallerGridPositions;
-
-        (biggerGridPositions, smallerGridPositions) = GetBiggerAndSmallerGridPositions(startGridPos, endGridPos);
-
-        for (int x = (int)smallerGridPositions.x; x <= (int)biggerGridPositions.x; x++)
-        {
-            for (int y = (int)smallerGridPositions.y; y <= (int)biggerGridPositions.y; y++)
-            {
-                Vector2 chunkGridPos = GridToChunkPos(new Vector2(x, y));
-                Chunk chunk = world.chunks[(int)chunkGridPos.x, (int)chunkGridPos.y];
-                selectedTiles[x - (int)smallerGridPositions.x, y - (int)smallerGridPositions.y] = chunk.tiles[x - (int)chunk.position.x * World.chunkSizeX, y - (int)chunk.position.y * World.chunkSizeY];
-            }
-        }
-        return selectedTiles;
     }
 
     /// <summary>
@@ -224,6 +194,31 @@ public class Builder : MonoBehaviour
 
         return (selectionMiddlePoint, selectionLocalScale);
     }
+
+    private Tile[,] FindSelectedTiles(Vector2 startGridPos, Vector2 endGridPos)
+    {
+
+        Vector2 selectionStartPosChunk = GridToChunkPos(startGridPos);
+        Vector2 selectionEndPosChunk = GridToChunkPos(endGridPos);
+
+        Vector2 biggerGridPositions;
+        Vector2 smallerGridPositions;
+
+        (biggerGridPositions, smallerGridPositions) = GetBiggerAndSmallerGridPositions(startGridPos, endGridPos);
+
+        for (int x = (int)smallerGridPositions.x; x <= (int)biggerGridPositions.x; x++)
+        {
+            for (int y = (int)smallerGridPositions.y; y <= (int)biggerGridPositions.y; y++)
+            {
+                Vector2 chunkGridPos = GridToChunkPos(new Vector2(x, y));
+                Chunk chunk = world.chunks[(int)chunkGridPos.x, (int)chunkGridPos.y];
+                selectedTiles[x - (int)smallerGridPositions.x, y - (int)smallerGridPositions.y] = chunk.tiles[x - (int)chunk.position.x * World.chunkSizeX, y - (int)chunk.position.y * World.chunkSizeY];
+            }
+        }
+        return selectedTiles;
+    }
+
+   
     /// <summary>
     /// If the selections starting X position is smaller than the ending X position 
     /// </summary>
@@ -264,14 +259,45 @@ public class Builder : MonoBehaviour
         return (biggerGridPositions, smallerGridPositions);
     }
 
-    Vector2 GridToChunkPos(Vector2 gridPos)
+    Vector2 GetSelectionDirection()
+    {
+        int directionX, directionY;
+        if (startXSmaller)
+        {
+            directionX = 1;
+        }
+        else
+        {
+            directionX = -1;
+        }
+
+        if (startYSmaller)
+        {
+            directionY = 1;
+        }
+        else
+        {
+            directionY = -1;
+        }
+        return new Vector2(directionX, directionY);
+    }
+    /// <summary>
+    /// Gets the chunk position of the chunk that you clicked on
+    /// </summary>
+    /// <param name="gridPos"></param>
+    /// <returns></returns>
+    public Vector2 GridToChunkPos(Vector2 gridPos)
     {
         Vector2 chunkPos = new Vector2(Mathf.FloorToInt(gridPos.x / World.chunkSizeX), Mathf.FloorToInt(gridPos.y / World.chunkSizeY));
         return chunkPos;
     }
-    Vector2 WorldToGridPos(Vector2 worldPos)
+    /// <summary>
+    ///  Translates the world position to world grid position
+    /// </summary>
+    /// <param name="worldPos"></param>
+    /// <returns></returns>
+    public Vector2 WorldToGridPos(Vector2 worldPos)
     {
-        //Vector2 gridPos = new Vector2(worldPos.x + ((WorldLoader.chunkSizeX / 2)) - 0.5f, worldPos.z + ((WorldLoader.chunkSizeY / 2)) - 0.5f);
         Vector2 gridPos = new Vector2(worldPos.x - 0.5f, worldPos.y - 0.5f);
         return gridPos;
     }

@@ -728,7 +728,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 1.5046787e-36, z: 2.27078e-40, w: 2.79273e-40}
+  m_BoundingSphereOverride: {x: NaN, y: 3.6e-43, z: 7.1746e-41, w: NaN}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -1340,6 +1340,7 @@ MonoBehaviour:
     type: 3}
   wallCubeGo: {fileID: 8621717785031692165, guid: be42f4fb0829b85489e4c319504de3ec,
     type: 3}
+  wallMaterial: {fileID: 2100000, guid: 8e4dc22b8469e7148a2b8d87fad62ce9, type: 2}
 --- !u!4 &1220083762
 Transform:
   m_ObjectHideFlags: 0

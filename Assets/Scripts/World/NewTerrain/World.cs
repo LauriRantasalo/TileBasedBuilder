@@ -8,10 +8,22 @@ public class World : MonoBehaviour
 {
     // This seems bad
     public static World instance;
+    /// <summary>
+    /// How many tiles in a chunk X
+    /// </summary>
     public static int chunkSizeX = 16;
+    /// <summary>
+    /// How many tiles in a chunk Y
+    /// </summary>
     public static int chunkSizeY = 16;
 
+    /// <summary>
+    /// How many chunks in X
+    /// </summary>
     public static int chunkGridSizeX = 3;
+    /// <summary>
+    /// How many chunks in Y
+    /// </summary>
     public static int chunkGridSizeY = 3;
 
     public Chunk[,] chunks;
@@ -25,6 +37,7 @@ public class World : MonoBehaviour
     public GameObject wallCubeGo;
     public Material wallMaterial;
 
+    Builder builder;
     // Start is called before the first frame update
     void Start()
     {
@@ -38,11 +51,10 @@ public class World : MonoBehaviour
             chunk.CreateVisualChunkMesh(new Mesh());
         }
         GetComponent<Builder>().enabled = true;
+        builder = GetComponent<Builder>();
         GetComponent<UIHandler>().enabled = true;
     }
 
-    //this should be in chunk
-    
     private void GenerateChunks()
     {
         chunks = new Chunk[chunkGridSizeX, chunkGridSizeY];
@@ -75,6 +87,5 @@ public class World : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
     }
 }

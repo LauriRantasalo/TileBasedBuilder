@@ -41,8 +41,6 @@ public class Chunk
                 {
                     wallMeshData.Merge(new MeshData(MeshData.AddWallOffset(newWallMesh.vertices, new Vector2(x,y)), newWallMesh.uv, newWallMesh.triangles));
                 }
-
-                
             }
         }
     }
@@ -78,7 +76,6 @@ public class Chunk
             for (int y = 0; y < chunkSizeY; y++)
             {
                 chunkMeshData.Merge(tiles[x, y].GetMeshData(tiles, new Vector2(x,y)));
-               
             }
         }
     }
@@ -96,7 +93,6 @@ public class Chunk
         chunkGameObject.GetComponent<MeshCollider>().sharedMesh = mesh;
 
         chunkGameObject.layer = LayerMask.NameToLayer("TileMask");
-
     }
 
     
