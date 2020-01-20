@@ -23,6 +23,7 @@ public class World : MonoBehaviour
     public Sprite wallSprite;
 
     public GameObject wallCubeGo;
+    public Material wallMaterial;
 
     // Start is called before the first frame update
     void Start()

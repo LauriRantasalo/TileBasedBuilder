@@ -130,13 +130,18 @@ public class Builder : MonoBehaviour
             {
                 Vector2 tileGridPos = new Vector2(startPos.x + x * directionX, startPos.y + y * directionY);
                 Vector2 chunkPos = GridToChunkPos(tileGridPos);
+
                 Chunk chunk = world.chunks[(int)chunkPos.x, (int)chunkPos.y];
+                Tile tile = chunk.tiles[(int)tileGridPos.x % World.chunkSizeX, (int)tileGridPos.y % World.chunkSizeY];
 
                 if (!chunksToUpdate.Contains(chunk))
                 {
                     chunksToUpdate.Add(chunk);
                 }
-
+                if (tile == Tile.wall && Tile.tileTypes[uiHandler.selectedMaterialIndex] != Tile.wall)
+                {
+                    chunk.wallsToRemoveAt.Add(tile);
+                }
                 chunk.tiles[(int)tileGridPos.x % World.chunkSizeX, (int)tileGridPos.y % World.chunkSizeY] = Tile.tileTypes[uiHandler.selectedMaterialIndex];//uiHandler.selectedTileType;
 
             }
@@ -154,6 +159,17 @@ public class Builder : MonoBehaviour
             {
                 c.MergeWallMesh(world.wallCubeGo.GetComponent<MeshFilter>().sharedMesh);
                 c.CreateVisualWallMesh(new Mesh());
+            }
+            else
+            {
+                if (c.wallsToRemoveAt.Count > 0)
+                {
+                    c.MergeWallMesh(world.wallCubeGo.GetComponent<MeshFilter>().sharedMesh);
+                    c.CreateVisualWallMesh(new Mesh());
+
+                    
+                    c.wallsToRemoveAt.Clear();
+                }
             }
             
         }

@@ -18,42 +18,15 @@ public class MeshData
         this.uvs = uvs;
         this.tris = tris;
     }
+    
 
-    public void MergeWalls(MeshData m, Vector2 offset)
+    public static Vector3[] AddWallOffset(Vector3[] wallVerts,Vector2 location)
     {
-        if (m.verts == null)
+        for (int i = 0; i < wallVerts.Length; i++)
         {
-            return;
+            wallVerts[i] += new Vector3(location.x + 0.5f, 0, location.y + 0.5f);
         }
-
-        if (verts == null)
-        {
-            verts = m.verts;
-            uvs = m.uvs;
-            tris = m.tris;
-
-
-            return;
-        }
-
-        int count = verts.Length;
-        ArrayUtility.AddRange(ref verts, m.verts);
-        ArrayUtility.AddRange(ref uvs, m.uvs);
-
-        for (int i = 0; i < m.tris.Length; i++)
-        {
-            ArrayUtility.Add(ref tris, m.tris[i] + count);
-        }
-        //AddWallOffset(offset);
-
-    }
-
-    public void AddWallOffset(Vector2 location)
-    {
-        for (int i = 0; i < verts.Length; i++)
-        {
-            verts[i] += new Vector3(location.x, 0, location.y);
-        }
+        return wallVerts;
     }
 
     public void AddTileOffset(Vector2 location)
@@ -64,7 +37,7 @@ public class MeshData
         }
     }
 
-    public void MergeTiles(MeshData m)
+    public void Merge(MeshData m)
     {
         if (m.verts == null)
         {
@@ -91,7 +64,7 @@ public class MeshData
 
     public Mesh CreateMesh(Mesh mesh)
     {
-        if (verts.Length <= 0)
+        if (verts == null || verts.Length <= 0)
         {
             return new Mesh();
         }
