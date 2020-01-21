@@ -52,11 +52,12 @@ public class Chunk
         if (wallGameObject == null)
         {
             wallGameObject = new GameObject("WallMesh", typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
-            wallGameObject.transform.position = new Vector3(position.x * chunkSizeX, 0.5f, position.y * chunkSizeY);
+            wallGameObject.transform.position = new Vector3(position.x * chunkSizeX, 1, position.y * chunkSizeY);
         }
         wallGameObject.GetComponent<MeshRenderer>().material = World.instance.wallMaterial;
         wallGameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
         wallGameObject.GetComponent<MeshCollider>().sharedMesh = mesh;
+        wallGameObject.transform.localScale = new Vector3(1, 2, 1);
         if (wallMeshData == new MeshData() && wallGameObject.activeSelf)
         {
             wallGameObject.SetActive(false);
