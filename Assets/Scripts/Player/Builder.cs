@@ -54,7 +54,7 @@ public class Builder : MonoBehaviour
 
                 selectionGrid.SetActive(false);
                 selectionEndTile.SetActive(false);
-                selectionEndWorldPosition = Vector3.zero;
+                selectionEndWorldPosition = Vector2.zero;
                 selectionStartWorldPosition = new Vector2(Mathf.FloorToInt(hit.point.x) + 0.5f, Mathf.FloorToInt(hit.point.z) + 0.5f);
                 selectionStartTile.transform.position = new Vector3(selectionStartWorldPosition.x, 0, selectionStartWorldPosition.y);
                 selectionStartTile.SetActive(true);
@@ -93,6 +93,10 @@ public class Builder : MonoBehaviour
                 selectionGrid.SetActive(false);
 
                 UpdateSelectedTiles();
+                if (uiHandler.selectedMaterialIndex == 3)
+                {
+                    world.CheckForRooms(WorldToGridPos(selectionEndWorldPosition));
+                }
             }
         }
         else if (gridCube.transform.position != new Vector3(0, -2, 0) || gridCube.activeSelf)
@@ -282,7 +286,7 @@ public class Builder : MonoBehaviour
         return new Vector2(directionX, directionY);
     }
     /// <summary>
-    /// Gets the chunk position of the chunk that you clicked on
+    /// Gets the grid position of the chunk that you clicked on
     /// </summary>
     /// <param name="gridPos"></param>
     /// <returns></returns>

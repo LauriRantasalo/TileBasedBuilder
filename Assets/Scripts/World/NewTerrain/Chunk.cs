@@ -8,7 +8,7 @@ public class Chunk
     public GameObject wallGameObject;
 
 
-    public Vector2 position;
+    public Vector2Int position;
     public Tile[,] tiles;
     public List<Tile> wallsToRemoveAt = new List<Tile>();
 
@@ -19,7 +19,7 @@ public class Chunk
 
     int chunkSizeX;
     int chunkSizeY;
-    public Chunk(Vector2 position)
+    public Chunk(Vector2Int position)
     {
         this.position = position;
 
@@ -39,7 +39,7 @@ public class Chunk
             {
                 if (tiles[x,y] == Tile.wall)
                 {
-                    wallMeshData.Merge(new MeshData(MeshData.AddWallOffset(newWallMesh.vertices, new Vector2(x,y)), newWallMesh.uv, newWallMesh.triangles));
+                    wallMeshData.Merge(new MeshData(MeshData.AddWallOffset(newWallMesh.vertices, new Vector2Int(x,y)), newWallMesh.uv, newWallMesh.triangles));
                 }
             }
         }
@@ -52,7 +52,7 @@ public class Chunk
         if (wallGameObject == null)
         {
             wallGameObject = new GameObject("WallMesh", typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
-            wallGameObject.transform.position = new Vector3(position.x * chunkSizeX, 1, position.y * chunkSizeY);
+            wallGameObject.transform.position = new Vector3Int(position.x * chunkSizeX, 1, position.y * chunkSizeY);
         }
         wallGameObject.GetComponent<MeshRenderer>().material = World.instance.wallMaterial;
         wallGameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
@@ -76,7 +76,7 @@ public class Chunk
         {
             for (int y = 0; y < chunkSizeY; y++)
             {
-                chunkMeshData.Merge(tiles[x, y].GetMeshData(tiles, new Vector2(x,y)));
+                chunkMeshData.Merge(tiles[x, y].GetMeshData(tiles, new Vector2Int(x,y)));
             }
         }
     }
