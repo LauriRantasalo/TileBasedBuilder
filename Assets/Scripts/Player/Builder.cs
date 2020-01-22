@@ -7,6 +7,8 @@ public class Builder : MonoBehaviour
 {
     World world;
     UIHandler uiHandler;
+    PathFindingGrid pathFindingGrid;
+    CharactersManager charactersManager;
 
     public GameObject gridCubeGo;
     public GameObject selectionGridGo;
@@ -24,6 +26,8 @@ public class Builder : MonoBehaviour
     {
         world = GetComponent<World>();
         uiHandler = GetComponent<UIHandler>();
+        pathFindingGrid = GetComponent<PathFindingGrid>();
+        charactersManager = GetComponent<CharactersManager>();
 
         tileLayerMask = LayerMask.GetMask("TileMask");
         gridCube = Instantiate(gridCubeGo, new Vector3(0, -2, 0), Quaternion.identity);
@@ -86,16 +90,21 @@ public class Builder : MonoBehaviour
             }
             if (Input.GetMouseButtonUp(0) && selectionStartTile.activeSelf)
             {
-                selectedTiles = FindSelectedTiles(WorldToGridPos(selectionStartWorldPosition), WorldToGridPos(selectionEndWorldPosition));
+                selectedTiles = FindSelectedTiles(FloorToGrid(selectionStartWorldPosition), FloorToGrid(selectionEndWorldPosition));
 
                 selectionStartTile.SetActive(false);
                 selectionEndTile.SetActive(false);
                 selectionGrid.SetActive(false);
 
                 UpdateSelectedTiles();
+
+                pathFindingGrid.CreateGrid();
+                charactersManager.FindNewPaths();
+
+                // If creating a wall
                 if (uiHandler.selectedMaterialIndex == 3)
                 {
-                    world.CheckForRooms(WorldToGridPos(selectionEndWorldPosition));
+                    world.CheckForRooms(FloorToGrid(selectionEndWorldPosition));
                 }
             }
         }
@@ -122,7 +131,7 @@ public class Builder : MonoBehaviour
     void UpdateSelectedTiles()
     {
         List<Chunk> chunksToUpdate = new List<Chunk>();
-        Vector2 startPos = WorldToGridPos(selectionStartWorldPosition);
+        Vector2 startPos = FloorToGrid(selectionStartWorldPosition);
 
         Vector2 directionV = GetSelectionDirection();
         int directionX = (int)directionV.x;
@@ -133,7 +142,7 @@ public class Builder : MonoBehaviour
             for (int y = 0; y < selectedTiles.GetLength(1); y++)
             {
                 Vector2 tileGridPos = new Vector2(startPos.x + x * directionX, startPos.y + y * directionY);
-                Vector2 chunkPos = GridToChunkPos(tileGridPos);
+                Vector2 chunkPos = WorldGridToChunkPos(tileGridPos);
 
                 Chunk chunk = world.chunks[(int)chunkPos.x, (int)chunkPos.y];
                 Tile tile = chunk.tiles[(int)tileGridPos.x % World.chunkSizeX, (int)tileGridPos.y % World.chunkSizeY];
@@ -184,8 +193,8 @@ public class Builder : MonoBehaviour
         Vector2 biggerGridPositions = Vector2.zero;
         Vector2 smallerGridPositions = Vector2.zero;
 
-        Vector2 selectionStartGridPosition = WorldToGridPos(selectionStartWorldPosition);
-        Vector2 selectionEndGridPosition = WorldToGridPos(selectionEndWorldPosition);
+        Vector2 selectionStartGridPosition = FloorToGrid(selectionStartWorldPosition);
+        Vector2 selectionEndGridPosition = FloorToGrid(selectionEndWorldPosition);
 
         (biggerGridPositions, smallerGridPositions) = GetBiggerAndSmallerGridPositions(selectionStartGridPosition, selectionEndGridPosition);
 
@@ -202,8 +211,8 @@ public class Builder : MonoBehaviour
     private Tile[,] FindSelectedTiles(Vector2 startGridPos, Vector2 endGridPos)
     {
 
-        Vector2 selectionStartPosChunk = GridToChunkPos(startGridPos);
-        Vector2 selectionEndPosChunk = GridToChunkPos(endGridPos);
+        Vector2 selectionStartPosChunk = WorldGridToChunkPos(startGridPos);
+        Vector2 selectionEndPosChunk = WorldGridToChunkPos(endGridPos);
 
         Vector2 biggerGridPositions;
         Vector2 smallerGridPositions;
@@ -214,7 +223,7 @@ public class Builder : MonoBehaviour
         {
             for (int y = (int)smallerGridPositions.y; y <= (int)biggerGridPositions.y; y++)
             {
-                Vector2 chunkGridPos = GridToChunkPos(new Vector2(x, y));
+                Vector2 chunkGridPos = WorldGridToChunkPos(new Vector2(x, y));
                 Chunk chunk = world.chunks[(int)chunkGridPos.x, (int)chunkGridPos.y];
                 selectedTiles[x - (int)smallerGridPositions.x, y - (int)smallerGridPositions.y] = chunk.tiles[x - (int)chunk.position.x * World.chunkSizeX, y - (int)chunk.position.y * World.chunkSizeY];
             }
@@ -290,7 +299,7 @@ public class Builder : MonoBehaviour
     /// </summary>
     /// <param name="gridPos"></param>
     /// <returns></returns>
-    public Vector2 GridToChunkPos(Vector2 gridPos)
+    public Vector2 WorldGridToChunkPos(Vector2 gridPos)
     {
         Vector2 chunkPos = new Vector2(Mathf.FloorToInt(gridPos.x / World.chunkSizeX), Mathf.FloorToInt(gridPos.y / World.chunkSizeY));
         return chunkPos;
@@ -300,7 +309,7 @@ public class Builder : MonoBehaviour
     /// </summary>
     /// <param name="worldPos"></param>
     /// <returns></returns>
-    public Vector2 WorldToGridPos(Vector2 worldPos)
+    public Vector2 FloorToGrid(Vector2 worldPos)
     {
         Vector2 gridPos = new Vector2(worldPos.x - 0.5f, worldPos.y - 0.5f);
         return gridPos;

@@ -53,6 +53,8 @@ public class World : MonoBehaviour
         GetComponent<Builder>().enabled = true;
         builder = GetComponent<Builder>();
         GetComponent<UIHandler>().enabled = true;
+        GetComponent<PathFindingGrid>().enabled = true;
+        GetComponent<CharactersManager>().enabled = true;
     }
 
     private void GenerateChunks()
@@ -75,7 +77,14 @@ public class World : MonoBehaviour
                         }
                         else
                         {
-                            chunk.tiles[x, y] = Tile.grass;
+                            if (x % 2 == 0)
+                            {
+                                chunk.tiles[x, y] = Tile.grass;
+                            }
+                            else
+                            {
+                                chunk.tiles[x, y] = Tile.grass;
+                            }
                         }
                     }
                 }
@@ -98,7 +107,6 @@ public class World : MonoBehaviour
         continueLooping = true;
         wallPositions = new List<Vector2>();
         firstPosition = position;
-        //wallPositions.Add(firstPosition);
         Vector2 currentPosition = position;
         loop = 0;
         while (continueLooping)
@@ -107,31 +115,21 @@ public class World : MonoBehaviour
             CheckSurroundingTiles(currentPosition);
 
 
-            if (newPositions.Count > 1)
+            while (newPositions.Count > 0)
             {
-                while (newPositions.Count > 0)
+                for (int i = 0; i < newPositions.Count; i++)
                 {
-                    for (int i = 0; i < newPositions.Count; i++)
-                    {
-                        CheckSurroundingTiles(newPositions[i]);
+                    CheckSurroundingTiles(newPositions[i]);
 
-                    }
-                    newPositions.Clear();
                 }
+                newPositions.Clear();
+            }
 
-            }
-            /*
-            if (newPositions.Count == 1)
-            {
-                currentPosition = newPositions[0];
-                
-            }
-            */
             if (newPositions.Count < 1)
             {
                 continueLooping = false;
             }
-            // This is bad
+            // This is just for debuging so it wont crash all the time.
             if (loop > 1000)
             {
                 Debug.Log("probably infinite loop");
@@ -154,7 +152,7 @@ public class World : MonoBehaviour
                 loopingPosition += new Vector2(x, y);
                 //Debug.Log(" first looping: " + loopingPosition);
 
-                Vector2 chunkPosition = builder.GridToChunkPos(loopingPosition);
+                Vector2 chunkPosition = builder.WorldGridToChunkPos(loopingPosition);
                 //Debug.Log("chunk: " + chunkPosition);
 
                 Vector2 inChunkLoopingPosition = new Vector2((int)loopingPosition.x % chunkSizeX, (int)loopingPosition.y % chunkSizeY);
@@ -178,8 +176,8 @@ public class World : MonoBehaviour
                         {
                             //Debug.Log("added to wallpositions: " + loopingPosition);
                             wallPositions.Add(loopingPosition);
-                            GameObject temp = Instantiate(wallCubeGo, new Vector3(loopingPosition.x + 0.5f, 4, loopingPosition.y + 0.5f), Quaternion.identity);
-                            gos.Add(temp);
+                            //GameObject temp = Instantiate(wallCubeGo, new Vector3(loopingPosition.x + 0.5f, 4, loopingPosition.y + 0.5f), Quaternion.identity);
+                            //gos.Add(temp);
                         }
                     }
                     else
