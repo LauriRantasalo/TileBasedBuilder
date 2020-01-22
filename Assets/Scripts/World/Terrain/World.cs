@@ -88,13 +88,19 @@ public class World : MonoBehaviour
     List<Vector2> newPositions;
     Vector2 firstPosition;
     bool continueLooping = true;
+    int loop = 0;
     public void CheckForRooms(Vector2 position)
     {
+        foreach (GameObject item in gos)
+        {
+            Destroy(item);
+        }
         continueLooping = true;
         wallPositions = new List<Vector2>();
         firstPosition = position;
-        wallPositions.Add(firstPosition);
+        //wallPositions.Add(firstPosition);
         Vector2 currentPosition = position;
+        loop = 0;
         while (continueLooping)
         {
             newPositions = new List<Vector2>();
@@ -112,40 +118,31 @@ public class World : MonoBehaviour
                     }
                     newPositions.Clear();
                 }
-                
+
             }
+            /*
             if (newPositions.Count == 1)
             {
                 currentPosition = newPositions[0];
+                
             }
+            */
             if (newPositions.Count < 1)
             {
                 continueLooping = false;
             }
-        }
-
-        CrawlWallPositions();
-        
-    }
-
-    private void CrawlWallPositions()
-    {
-        List<Vector2> intersections = new List<Vector2>();
-        foreach (Vector2 position in wallPositions)
-        {
-            for (int x = -1; x <= 1; x++)
+            // This is bad
+            if (loop > 1000)
             {
-                for (int y = -1; y <= 1; y++)
-                {
-                    Vector2 crawlpos = position + new Vector2(x, y);
-                    if (true)
-                    {
-
-                    }
-                }
+                Debug.Log("probably infinite loop");
+                continueLooping = false;
             }
+            loop++;
         }
+
     }
+
+    List<GameObject> gos = new List<GameObject>();
     private void CheckSurroundingTiles(Vector2 currentPosition)
     {
         //Debug.Log("first current: " + currentPosition);
@@ -169,8 +166,10 @@ public class World : MonoBehaviour
 
                 if (chunk.tiles[(int)inChunkLoopingPosition.x, (int)inChunkLoopingPosition.y] == Tile.wall)
                 {
-                    if (!wallPositions.Contains(loopingPosition))
+
+                    if (!wallPositions.Contains(loopingPosition)) //&& (x != 0 && y != 0)
                     {
+                        
                         if (!newPositions.Contains(loopingPosition))
                         {
                             newPositions.Add(loopingPosition);
@@ -179,20 +178,46 @@ public class World : MonoBehaviour
                         {
                             //Debug.Log("added to wallpositions: " + loopingPosition);
                             wallPositions.Add(loopingPosition);
-                            Instantiate(wallCubeGo, new Vector3(loopingPosition.x + 0.5f, 4, loopingPosition.y + 0.5f), Quaternion.identity);
+                            GameObject temp = Instantiate(wallCubeGo, new Vector3(loopingPosition.x + 0.5f, 4, loopingPosition.y + 0.5f), Quaternion.identity);
+                            gos.Add(temp);
                         }
                     }
-                    if (loopingPosition == firstPosition && wallPositions.Count > 8)
+                    else
+                    {
+                        // TODO: Check if you can loop the walls
+                    }
+                    
+
+                    if (wallPositions.Count > 0 && loopingPosition == wallPositions[0] && loop > 30)
                     {
                         Debug.Log("Found room");
+                        continueLooping = false;
                     }
+
+                    //Debug.Log("wallpositions[0]: " + wallPositions[0]);
+                    //Debug.Log("looping: " + loopingPosition);
+
                 }
             }
-        }
 
+        }
     }
+   
+    /*
+     * 
+     * 
+ 
+        for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+
+                }
+            }
+     * */
     // Update is called once per frame
     void Update()
-    {
-    }
+        {
+        }
 }
+

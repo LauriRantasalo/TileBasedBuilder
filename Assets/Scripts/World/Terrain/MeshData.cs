@@ -1,18 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
-namespace old
-{
 
 public class MeshData
 {
     Vector3[] verts;
     Vector2[] uvs;
     int[] tris;
-    public Vector2 sprite = new Vector2(0, 3);
 
-    float spriteSize = 0.25f;
+    public MeshData() { }
 
     public MeshData(Vector3[] verts, Vector2[] uvs, int[] tris)
     {
@@ -20,69 +18,65 @@ public class MeshData
         this.uvs = uvs;
         this.tris = tris;
     }
-    public MeshData()
+    
+
+    public static Vector3[] AddWallOffset(Vector3[] wallVerts,Vector2 location)
     {
-
-    }
-    public Mesh UpdateTileSprite(Mesh mesh, Sprite s)
-    {
-        mesh.uv[0] = s.uv[0];
-        mesh.uv[1] = s.uv[1];
-        mesh.uv[2] = s.uv[2];
-        mesh.uv[3] = s.uv[3];
-
-
-        mesh.RecalculateBounds();
-        mesh.RecalculateNormals();
-        return mesh;
+        for (int i = 0; i < wallVerts.Length; i++)
+        {
+            wallVerts[i] += new Vector3(location.x + 0.5f, 0, location.y + 0.5f);
+        }
+        return wallVerts;
     }
 
-    public Mesh CreateTileMesh(Vector2 tilePos, Sprite s)
+    public void AddTileOffset(Vector2 location)
     {
-
-        verts = new Vector3[4];
-        uvs = new Vector2[4];
-        tris = new int[6];
-
-        verts[0] = new Vector3(0,1,0);
-        verts[1] = new Vector3(0,1,1);
-        verts[2] = new Vector3(1,1,0);
-        verts[3] = new Vector3(1,1,1);
-
-
-        uvs[0] = s.uv[0];
-        uvs[1] = s.uv[1];
-        uvs[2] = s.uv[2];
-        uvs[3] = s.uv[3];
-
-        // This is how it should work, but unity was being weird I think about this, so Im doing it Unitys way
-        //uvs[0] = new Vector2(sprite.x * spriteSize, sprite.y * spriteSize);
-        //uvs[1] = new Vector2(sprite.x * spriteSize + spriteSize, sprite.y * spriteSize);
-        //uvs[2] = new Vector2(sprite.x * spriteSize, sprite.y * spriteSize + spriteSize);
-        //uvs[3] = new Vector2(sprite.x * spriteSize + spriteSize, sprite.y * spriteSize + spriteSize);
-
-        tris[0] = 0;
-        tris[1] = 1;
-        tris[2] = 2;
-        tris[3] = 3;
-        tris[4] = 2;
-        tris[5] = 1;
-
-        Mesh mesh = new Mesh();
-
         for (int i = 0; i < verts.Length; i++)
         {
-            verts[i] += new Vector3(tilePos.x, -1, tilePos.y);
+            verts[i] += new Vector3(location.x, -1, location.y);
         }
-
-        mesh.vertices = verts;
-        mesh.uv = uvs;
-        mesh.triangles = tris;
-
-        return mesh;
     }
 
-     
-}
+    public void Merge(MeshData m)
+    {
+        if (m.verts == null)
+        {
+            return;
+        }
 
+        if (verts == null)
+        {
+            verts = m.verts;
+            uvs = m.uvs;
+            tris = m.tris;
+            return;
+        }
+
+        int count = verts.Length;
+        ArrayUtility.AddRange(ref verts, m.verts);
+        ArrayUtility.AddRange(ref uvs, m.uvs);
+
+        for (int i = 0; i < m.tris.Length; i++)
+        {
+            ArrayUtility.Add(ref tris, m.tris[i] + count);
+        }
+    }
+
+    public Mesh CreateMesh(Mesh mesh)
+    {
+        if (verts == null || verts.Length <= 0)
+        {
+            return new Mesh();
+        }
+        else
+        {
+            mesh.vertices = verts;
+            mesh.triangles = tris;
+            mesh.uv = uvs;
+
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
+            return mesh;
+        }
+    }
 }
