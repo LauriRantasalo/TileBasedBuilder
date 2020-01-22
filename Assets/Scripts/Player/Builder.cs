@@ -295,7 +295,7 @@ public class Builder : MonoBehaviour
         return new Vector2(directionX, directionY);
     }
     /// <summary>
-    /// Gets the grid position of the chunk that you clicked on
+    /// Gets the grid position of the chunk that the position is in
     /// </summary>
     /// <param name="gridPos"></param>
     /// <returns></returns>

@@ -7,9 +7,9 @@ public class PathFinding : MonoBehaviour
 {
     GameObject main;
     PathFindingGrid pathFindingGrid;
-    [HideInInspector]
+    //[HideInInspector]
     public GameObject target;
-    Vector3 targetPos = new Vector3();
+    Vector3 targetPosition = new Vector3();
     //public Transform startPosition;
     //public Transform targetPosition;
 
@@ -19,21 +19,42 @@ public class PathFinding : MonoBehaviour
         main = GameObject.Find("Main");
         pathFindingGrid = main.GetComponent<PathFindingGrid>();
     }
-
+    public Node currentCharNode;
     void Update()
     {
-        /*
-        Node charNode = pathFindingGrid.NodeFromWorldPos(transform.position);
-        Vector2 charGridPosition = new Vector2(charNode.gridX, charNode.gridY);
-        */
-        if (target != null && target.transform.position != targetPos)
+        currentCharNode = pathFindingGrid.NodeFromWorldPos(transform.position);
+        //Vector2 charGridPosition = new Vector2(charNode.gridX, charNode.gridY);
+
+        if (target != null && target.transform.position != targetPosition)
         {
-            targetPos = target.transform.position;
-            FindPath();
-            //Debug.Log("Finding target");
+            if (target.GetComponent<PathFinding>() == null)
+            {
+                targetPosition = target.transform.position;
+                FindPath(transform.position, targetPosition);
+            }
+            else
+            {
+                if (Vector3.Distance(target.transform.position, targetPosition) > 0.5f)
+                {
+                    if (finalPath == null)
+                    {
+                        targetPosition = target.transform.position;
+                        FindPath(transform.position, targetPosition);
+                        //Debug.Log("Finding target");
+                    }
+                    else
+                    {
+                        finalPath.Add(target.GetComponent<PathFinding>().currentCharNode);
+                    }
+
+                }
+            }
+
+            
+
         }
 
-        if (finalPath != null )
+        if (finalPath != null && finalPath.Count > 0)
         {
             if (pathFindingGrid.NodeFromWorldPos(transform.position) != finalPath[0])
             {
@@ -51,9 +72,9 @@ public class PathFinding : MonoBehaviour
         //FindPath(startPosition.position, targetPosition.position);
     }
 
-    public void FindPath()
+    public void FindPath(Vector3 startPos, Vector3 targetPos)
     {
-        Vector3 startPos = transform.position;
+        //Vector3 startPos = transform.position;
 
         Node startNode = pathFindingGrid.NodeFromWorldPos(startPos);
         Node targetNode = pathFindingGrid.NodeFromWorldPos(targetPos);
@@ -111,7 +132,7 @@ public class PathFinding : MonoBehaviour
         return ix + iy;
     }
 
-    List<Node> finalPath = new List<Node>();
+    public List<Node> finalPath = new List<Node>();
     private void GetFinalPath(Node startNode, Node targetNode)
     {
         Node currentNode = targetNode;
@@ -126,27 +147,28 @@ public class PathFinding : MonoBehaviour
         //pathFindingGrid.finalPath = finalPath;
     }
 
-    /*
-     * 
-     * private void OnDrawGizmos()
+    private void OnDrawGizmos()
     {
-        Gizmos.DrawWireCube(new Vector3(0, 0, 0), new Vector3(pathFindingGrid.gridSizeX, 1, pathFindingGrid.gridSizeY));
+        //Gizmos.DrawWireCube(new Vector3(pathFindingGrid.gridSizeX / 2, 0, pathFindingGrid.gridSizeY / 2), new Vector3(pathFindingGrid.gridSizeX, 1, pathFindingGrid.gridSizeY));
 
         if (pathFindingGrid.grid != null)
         {
             foreach (Node node in pathFindingGrid.grid)
             {
+                if (node.isWall)
+                {
+                    Gizmos.color = Color.red;                   
+                }
                 if (finalPath != null)
                 {
                     if (finalPath.Contains(node))
                     {
-                        Gizmos.DrawCube(new Vector3(node.gridX + 0.5f, 1, node.gridY + 0.5f), Vector3.one);
                         Gizmos.color = Color.yellow;
+                        Gizmos.DrawCube(new Vector3(node.gridX + 0.5f, 1, node.gridY + 0.5f), Vector3.one);
                     }
                 }
 
             }
         }
     }
-     * */
 }

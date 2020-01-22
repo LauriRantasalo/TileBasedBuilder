@@ -19,17 +19,18 @@ public class CharactersManager : MonoBehaviour
         {
             pf = c.GetComponent<PathFinding>();
             pf.target = target;
-            pf.FindPath();
+            pf.finalPath = new List<Node>();
+            pf.FindPath(pf.transform.position, target.transform.position);
         }
     }
     // Start is called before the first frame update
     void Start()
     {
 
-        character = Instantiate(charPrefab, new Vector3(2, 1, 2), Quaternion.identity);
-        characters.Add(character);
-        character = Instantiate(charPrefab, new Vector3(2, 1, 20), Quaternion.identity);
-        characters.Add(character);
+        GameObject temp1 = Instantiate(charPrefab, new Vector3(2, 1, 10), Quaternion.identity);
+        characters.Add(temp1);
+        temp1 = Instantiate(charPrefab, new Vector3(2, 1, 2), Quaternion.identity);
+        characters.Add(temp1);
         FindNewPaths();
     }
 

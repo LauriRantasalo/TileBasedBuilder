@@ -39,22 +39,21 @@ public class PathFindingGrid : MonoBehaviour
     public void CreateGrid()
     {
         grid = new Node[gridSizeX, gridSizeY];
-
         for (int x = 0; x < gridSizeX; x++)
         {
             for (int y = 0; y < gridSizeY; y++)
             {
                 Vector3 worldPosition = new Vector3(x, 0, y);
-                Vector2 chunkPos = builder.WorldGridToChunkPos(worldPosition);
+                Vector2 chunkPos = builder.WorldGridToChunkPos(new Vector2(worldPosition.x, worldPosition.z));
                 Chunk chunk = world.chunks[(int)chunkPos.x, (int)chunkPos.y];
                 Vector2 inChunkPosition = new Vector2(worldPosition.x % World.chunkSizeX, worldPosition.z % World.chunkSizeY);
                 if (chunk.tiles[(int)inChunkPosition.x,(int)inChunkPosition.y] == Tile.wall)
                 {
-                    grid[x, y] = new Node(true, worldPosition, x, y);
+                    grid[x, y] = new Node(true, worldPosition + new Vector3(0.5f, 0, 0.5f), x, y);
                 }
                 else
                 {
-                    grid[x, y] = new Node(false, worldPosition, x, y);
+                    grid[x, y] = new Node(false, worldPosition + new Vector3(0.5f, 0, 0.5f), x, y);
 
                 }
             }
@@ -116,5 +115,24 @@ public class PathFindingGrid : MonoBehaviour
         return neighborNodes;
     }
 
-    
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(new Vector3(gridSizeX / 2, 0, gridSizeY / 2), new Vector3(gridSizeX, 1, gridSizeY));
+        if (grid != null)
+        {
+            foreach (Node node in grid)
+            {
+                if (node.isWall)
+                {
+                    Gizmos.color = Color.red;
+                }
+                else
+                {
+                    Gizmos.color = Color.blue;
+                }
+
+                Gizmos.DrawCube(new Vector3(node.gridX + 0.5f, 1, node.gridY + 0.5f), Vector3.one);
+            }
+        }
+    }
 }
