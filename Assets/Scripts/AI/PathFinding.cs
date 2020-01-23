@@ -87,7 +87,7 @@ public class PathFinding : MonoBehaviour
                 //Debug.Log(pathFindingGrid.NodeFromWorldPos(transform.position).position);
                 //Debug.Log(finalPathList[0].position);
                 //Debug.Log(finalPathList[2303].position);
-                transform.position = Vector3.MoveTowards(transform.position, new Vector3(nFinalPath[0].gridX, 1, nFinalPath[0].gridY), speed * Time.deltaTime);
+                transform.position = Vector3.MoveTowards(transform.position, new Vector3(nFinalPath[0].gridX + 0.5f, 1, nFinalPath[0].gridY + 0.5f), speed * Time.deltaTime);
             }
             else
             {

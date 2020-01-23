@@ -30,7 +30,7 @@ public class CharactersManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 50; i++)
         {
             int x = Random.Range(0, World.chunkSizeX * World.chunkGridSizeX);
             int y = Random.Range(0, World.chunkSizeY * World.chunkGridSizeY);
