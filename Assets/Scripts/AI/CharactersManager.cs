@@ -17,26 +17,52 @@ public class CharactersManager : MonoBehaviour
         PathFinding pf;
         foreach (GameObject c in characters)
         {
-            pf = c.GetComponent<PathFinding>();
-            pf.target = target;
-            pf.finalPath = new List<Node>();
-            pf.FindPath(pf.transform.position, target.transform.position);
+            updatePool.Add(c);
+            //pf = c.GetComponent<PathFinding>();
+            
+            //pf.FindPathFunction(target);
+            //StartCoroutine(pf.FindPath());
+            
+            //pf.FindPathFunction(target);
+            //pf.FindPath(pf.transform.position, target.transform.position);
         }
     }
     // Start is called before the first frame update
     void Start()
     {
-
-        GameObject temp1 = Instantiate(charPrefab, new Vector3(2, 1, 10), Quaternion.identity);
-        characters.Add(temp1);
-        temp1 = Instantiate(charPrefab, new Vector3(2, 1, 2), Quaternion.identity);
-        characters.Add(temp1);
+        for (int i = 0; i < 20; i++)
+        {
+            int x = Random.Range(0, World.chunkSizeX * World.chunkGridSizeX);
+            int y = Random.Range(0, World.chunkSizeY * World.chunkGridSizeY);
+            GameObject temp = Instantiate(charPrefab, new Vector3(x, 1, y), Quaternion.identity);
+            characters.Add(temp);
+        }
+        
+        
         FindNewPaths();
     }
 
+    Vector3 targetPos = Vector3.zero;
+
+    List<GameObject> updatePool = new List<GameObject>();
     // Update is called once per frame
     void Update()
     {
-        
+
+        if (Vector3.Distance(target.transform.position, targetPos) > 0.5f)
+        {
+            targetPos = target.transform.position;
+            updatePool.Clear();
+            updatePool.AddRange(characters);
+        }
+
+        if (updatePool.Count > 0)
+        {
+            PathFinding pf = updatePool[0].GetComponent<PathFinding>();
+            pf.FindPathFunction(target);
+            StartCoroutine(pf.FindPath());
+            updatePool.RemoveAt(0);
+            Debug.Log("yes");
+        }
     }
 }

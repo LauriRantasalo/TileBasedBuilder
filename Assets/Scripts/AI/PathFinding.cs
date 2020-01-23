@@ -2,6 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Jobs;
+using Unity.Collections;
+using System.Linq;
 
 public class PathFinding : MonoBehaviour
 {
@@ -9,87 +12,125 @@ public class PathFinding : MonoBehaviour
     PathFindingGrid pathFindingGrid;
     //[HideInInspector]
     public GameObject target;
-    Vector3 targetPosition = new Vector3();
+    public Vector3 targetPosition = new Vector3();
+    public Vector3 startPosition = new Vector3();
     //public Transform startPosition;
     //public Transform targetPosition;
 
-    public float speed = 5f;
+
+    public List<Node> nFinalPath = new List<Node>();
+    Node[,] nGrid;
+
+
+    public float speed = 1f;
     private void Awake()
     {
         main = GameObject.Find("Main");
         pathFindingGrid = main.GetComponent<PathFindingGrid>();
+        nGrid = pathFindingGrid.nGrid;
     }
-    public Node currentCharNode;
     void Update()
     {
-        currentCharNode = pathFindingGrid.NodeFromWorldPos(transform.position);
-        //Vector2 charGridPosition = new Vector2(charNode.gridX, charNode.gridY);
-
-        if (target != null && target.transform.position != targetPosition)
+        if (target != null )//&& (nFinalPath == null || nFinalPath.Count < 1))
         {
-            if (target.GetComponent<PathFinding>() == null)
+            if (Vector3.Distance(target.transform.position, targetPosition) > 0.5f)
             {
                 targetPosition = target.transform.position;
-                FindPath(transform.position, targetPosition);
-            }
-            else
-            {
-                if (Vector3.Distance(target.transform.position, targetPosition) > 0.5f)
-                {
-                    if (finalPath == null)
-                    {
-                        targetPosition = target.transform.position;
-                        FindPath(transform.position, targetPosition);
-                        //Debug.Log("Finding target");
-                    }
-                    else
-                    {
-                        finalPath.Add(target.GetComponent<PathFinding>().currentCharNode);
-                    }
-
-                }
+                startPosition = transform.position;
+                //StartCoroutine("FindPath");
             }
 
-            
-
-        }
-
-        if (finalPath != null && finalPath.Count > 0)
-        {
-            if (pathFindingGrid.NodeFromWorldPos(transform.position) != finalPath[0])
-            {
-                transform.position = Vector3.MoveTowards(transform.position, new Vector3(finalPath[0].gridX, 1, finalPath[0].gridY), speed * Time.deltaTime);
-            }
-            else
-            {
-                finalPath.RemoveAt(0);
-            }
-
-            
         }
         
-        //grid.CreateGrid();
-        //FindPath(startPosition.position, targetPosition.position);
+        if (pathFindingGrid.nGrid != nGrid)
+        {
+            nGrid = pathFindingGrid.nGrid;
+            targetPosition = target.transform.position;
+            startPosition = transform.position;
+            //StartCoroutine("FindPath");
+        }
+        #region
+        /*
+        if (target != null && (finalPathList == null || finalPathList.Count < 1))
+        {
+            targetPosition = target.transform.position;
+
+            finalPath = new NativeArray<StructNode>(World.chunkSizeX * World.chunkGridSizeX * World.chunkSizeY * World.chunkGridSizeY, Allocator.TempJob);
+            NativeArray<int> debugArray = new NativeArray<int>(10, Allocator.TempJob);
+
+            FindPath findPathJob = new FindPath
+            {
+                startPos = transform.position,
+                targetPos = targetPosition,
+                grid = grid,
+                finalPath = finalPath,
+                debugArray = debugArray,
+            };
+            JobHandle jobHandle = findPathJob.Schedule();
+            jobHandle.Complete();
+            finalPath = findPathJob.finalPath;
+            for (int i = 0; i < debugArray.Length; i++)
+            {
+                Debug.Log("DEBUG array " + i + ": " + debugArray[i]);
+
+            }
+            finalPathList.AddRange(finalPath);
+            finalPath.Dispose();
+            debugArray.Dispose();
+        }
+        */
+        #endregion
+        if (nFinalPath != null && nFinalPath.Count > 0)
+        {
+            if (pathFindingGrid.NodeFromWorldPos(transform.position) != nFinalPath[0])
+            {
+                //Debug.Log(pathFindingGrid.NodeFromWorldPos(transform.position).position);
+                //Debug.Log(finalPathList[0].position);
+                //Debug.Log(finalPathList[2303].position);
+                transform.position = Vector3.MoveTowards(transform.position, new Vector3(nFinalPath[0].gridX, 1, nFinalPath[0].gridY), speed * Time.deltaTime);
+            }
+            else
+            {
+                nFinalPath.RemoveAt(0);
+            }
+
+
+        }
+
+        
     }
 
-    public void FindPath(Vector3 startPos, Vector3 targetPos)
+    public void FindPathFunction(GameObject target)
+    {
+        nFinalPath = new List<Node>();
+        this.target = target;
+        targetPosition = target.transform.position;
+        startPosition = transform.position;
+    }
+    //IEnumerator FindPath(Vector3 startPos, Vector3 targetPos)
+    public IEnumerator FindPath()
     {
         //Vector3 startPos = transform.position;
-
+        Vector3 targetPos = targetPosition;
+        Vector3 startPos = startPosition;
         Node startNode = pathFindingGrid.NodeFromWorldPos(startPos);
         Node targetNode = pathFindingGrid.NodeFromWorldPos(targetPos);
 
         List<Node> openList = new List<Node>();
         HashSet<Node> ClosedList = new HashSet<Node>();
 
+        //Debug.Log(startNode.position);
+        //Debug.Log(targetNode.position);
         openList.Add(startNode);
         while(openList.Count > 0)
         {
             Node currentNode = openList[0];
             for (int i = 1; i < openList.Count; i++)
             {
+
                 if (openList[i].FCost <= currentNode.FCost && openList[i].hCost < currentNode.hCost)
                 {
+                    //Debug.Log("looping openlist");
                     currentNode = openList[i];
                 }
             }
@@ -122,6 +163,7 @@ public class PathFinding : MonoBehaviour
                 }
             }
         }
+        yield return null;
     }
 
     private int GetManhatterDistance(Node nodeA, Node nodeB)
@@ -132,43 +174,19 @@ public class PathFinding : MonoBehaviour
         return ix + iy;
     }
 
-    public List<Node> finalPath = new List<Node>();
     private void GetFinalPath(Node startNode, Node targetNode)
     {
         Node currentNode = targetNode;
-        finalPath = new List<Node>();
+        nFinalPath = new List<Node>();
         while(currentNode != startNode)
         {
-            finalPath.Add(currentNode);
+            nFinalPath.Add(currentNode);
             currentNode = currentNode.parent;
         }
-        finalPath.Reverse();
-        
+        nFinalPath.Reverse();
+
         //pathFindingGrid.finalPath = finalPath;
     }
 
-    private void OnDrawGizmos()
-    {
-        //Gizmos.DrawWireCube(new Vector3(pathFindingGrid.gridSizeX / 2, 0, pathFindingGrid.gridSizeY / 2), new Vector3(pathFindingGrid.gridSizeX, 1, pathFindingGrid.gridSizeY));
-
-        if (pathFindingGrid.grid != null)
-        {
-            foreach (Node node in pathFindingGrid.grid)
-            {
-                if (node.isWall)
-                {
-                    Gizmos.color = Color.red;                   
-                }
-                if (finalPath != null)
-                {
-                    if (finalPath.Contains(node))
-                    {
-                        Gizmos.color = Color.yellow;
-                        Gizmos.DrawCube(new Vector3(node.gridX + 0.5f, 1, node.gridY + 0.5f), Vector3.one);
-                    }
-                }
-
-            }
-        }
-    }
+    
 }
