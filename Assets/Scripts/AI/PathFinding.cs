@@ -177,13 +177,16 @@ public class PathFinding : MonoBehaviour
     private void GetFinalPath(Node startNode, Node targetNode)
     {
         Node currentNode = targetNode;
-        nFinalPath = new List<Node>();
+        //nFinalPath = new List<Node>();
+        List<Node> path = new List<Node>();
         while(currentNode != startNode)
         {
-            nFinalPath.Add(currentNode);
+            path.Add(currentNode);
             currentNode = currentNode.parent;
         }
-        nFinalPath.Reverse();
+        path.Reverse();
+        nFinalPath = path;
+        //nFinalPath.Reverse();
 
         //pathFindingGrid.finalPath = finalPath;
     }

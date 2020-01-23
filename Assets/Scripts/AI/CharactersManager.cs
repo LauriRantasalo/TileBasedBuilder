@@ -9,27 +9,20 @@ public class CharactersManager : MonoBehaviour
 
     GameObject character;
     public GameObject target;
-
+    PathFindingGrid pathFindingGrid;
 
 
     public void FindNewPaths()
     {
-        PathFinding pf;
         foreach (GameObject c in characters)
         {
             updatePool.Add(c);
-            //pf = c.GetComponent<PathFinding>();
-            
-            //pf.FindPathFunction(target);
-            //StartCoroutine(pf.FindPath());
-            
-            //pf.FindPathFunction(target);
-            //pf.FindPath(pf.transform.position, target.transform.position);
         }
     }
     // Start is called before the first frame update
     void Start()
     {
+        pathFindingGrid = GetComponent<PathFindingGrid>();
         for (int i = 0; i < 50; i++)
         {
             int x = Random.Range(0, World.chunkSizeX * World.chunkGridSizeX);
@@ -37,11 +30,15 @@ public class CharactersManager : MonoBehaviour
             GameObject temp = Instantiate(charPrefab, new Vector3(x, 1, y), Quaternion.identity);
             characters.Add(temp);
         }
-        
+
         
         FindNewPaths();
     }
 
+    private void OnDrawGizmos()
+    {
+        //Gizmos.DrawCube(pathFindingGrid.NodeFromWorldPos(target.transform.position).position + new Vector3(0.5f, 0, 0.5f), Vector3.one);
+    }
     Vector3 targetPos = Vector3.zero;
 
     List<GameObject> updatePool = new List<GameObject>();
@@ -61,8 +58,8 @@ public class CharactersManager : MonoBehaviour
             PathFinding pf = updatePool[0].GetComponent<PathFinding>();
             pf.FindPathFunction(target);
             StartCoroutine(pf.FindPath());
+
             updatePool.RemoveAt(0);
-            Debug.Log("yes");
         }
     }
 }
