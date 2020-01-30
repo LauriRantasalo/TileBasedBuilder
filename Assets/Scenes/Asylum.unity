@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -680,8 +681,9 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
   m_Enabled: 1
-  serializedVersion: 9
+  serializedVersion: 10
   m_Type: 1
+  m_Shape: 0
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
   m_Intensity: 1
   m_Range: 10
@@ -728,7 +730,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 6.409691e-10, y: 6.815046e-31, z: 1.3563128e-19, w: 1.3563156e-19}
+  m_BoundingSphereOverride: {x: 3.0092666e-36, y: 1.009742e-28, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -1311,7 +1313,6 @@ GameObject:
   - component: {fileID: 1220083763}
   - component: {fileID: 1220083764}
   - component: {fileID: 1220083765}
-  - component: {fileID: 1220083766}
   m_Layer: 0
   m_Name: Main
   m_TagString: Untagged
@@ -1328,7 +1329,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1220083760}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caf653f7f6384d940885252fd580b3bd, type: 3}
+  m_Script: {fileID: 11500000, guid: 1caf7822a0b905c4986de1c4dad99697, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   textureMaterial: {fileID: 2100000, guid: d1cf6cae7c17f1a4b8ae7559b1ae108b, type: 2}
@@ -1400,27 +1401,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1220083760}
   m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2afaa187c6a7914a835a49c332a9562, type: 3}
+  m_Script: {fileID: 11500000, guid: eccbdacfdc4352245b7c61f26f915e18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPosition: {fileID: 0}
-  gridSizeX: 0
-  gridSizeY: 0
---- !u!114 &1220083766
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1220083760}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59767e98ca1233d4b8e4671eb4b70f0e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  characters: []
-  charPrefab: {fileID: 8129860645011317168, guid: 79d3aaa7f8a8c40428739340663f3bda,
+  characterPrefab: {fileID: 8129860645011317168, guid: 79d3aaa7f8a8c40428739340663f3bda,
     type: 3}
+  nroOfCharactersToSpawn: 1
   target: {fileID: 1376388462}
 --- !u!1 &1340568069
 GameObject:
@@ -1504,6 +1490,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
